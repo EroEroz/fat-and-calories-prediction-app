@@ -15,48 +15,54 @@ interface Activity {
 }
 
 interface ActivityScreenProps {
-  onBack: () => void
-  onActivitySelect: (activity: Activity) => void
-  onNavigateToStats?: () => void
+  onBack: () => void;
+  onActivitySelect: (activity: Activity) => void;
+  onNavigateToStats?: () => void;
+  onCaloriePredictor: () => void;
 }
 
-export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: ActivityScreenProps) {
-  const [selectedTab, setSelectedTab] = useState('popular')
+export function ActivityScreen({
+  onBack,
+  onActivitySelect,
+  onNavigateToStats,
+  onCaloriePredictor,
+}: ActivityScreenProps) {
+  const [selectedTab, setSelectedTab] = useState("popular");
 
   const activities: Activity[] = [
     {
-      id: '1',
-      name: 'Swimming',
+      id: "1",
+      name: "Swimming",
       calories: 430,
-      image: 'swimming',
-      color: 'from-blue-400 to-cyan-400'
+      image: "swimming",
+      color: "from-blue-400 to-cyan-400",
     },
     {
-      id: '2', 
-      name: 'Playing Tennis',
+      id: "2",
+      name: "Playing Tennis",
       calories: 430,
-      image: 'tennis',
-      color: 'from-green-400 to-teal-400'
+      image: "tennis",
+      color: "from-green-400 to-teal-400",
     },
     {
-      id: '3',
-      name: 'Running',
+      id: "3",
+      name: "Running",
       calories: 380,
-      image: 'running',
-      color: 'from-orange-400 to-red-400'
+      image: "running",
+      color: "from-orange-400 to-red-400",
     },
     {
-      id: '4',
-      name: 'Cycling',
+      id: "4",
+      name: "Cycling",
       calories: 320,
-      image: 'cycling',
-      color: 'from-purple-400 to-pink-400'
-    }
-  ]
+      image: "cycling",
+      color: "from-purple-400 to-pink-400",
+    },
+  ];
 
   const renderActivityIllustration = (activity: Activity) => {
     switch (activity.image) {
-      case 'swimming':
+      case "swimming":
         return (
           <div className="relative h-32 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl p-4 overflow-hidden">
             {/* Pool background */}
@@ -64,7 +70,7 @@ export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: 
             {/* Water waves */}
             <div className="absolute bottom-0 left-0 right-0 h-8 bg-blue-300 opacity-40 rounded-full"></div>
             <div className="absolute bottom-2 left-0 right-0 h-6 bg-blue-400 opacity-30 rounded-full"></div>
-            
+
             {/* Swimmer */}
             <div className="relative z-10 flex items-center justify-center h-full">
               <div className="relative">
@@ -82,16 +88,16 @@ export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: 
               </div>
             </div>
           </div>
-        )
-      
-      case 'tennis':
+        );
+
+      case "tennis":
         return (
           <div className="relative h-32 bg-gradient-to-br from-green-100 to-teal-100 rounded-2xl p-4 overflow-hidden">
             {/* Court background */}
             <div className="absolute inset-0 bg-gradient-to-b from-green-200 to-green-300 opacity-30"></div>
             {/* Court lines */}
             <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-white opacity-60"></div>
-            
+
             {/* Tennis player */}
             <div className="relative z-10 flex items-center justify-center h-full">
               <div className="relative">
@@ -116,42 +122,44 @@ export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: 
               </div>
             </div>
           </div>
-        )
-      
+        );
+
       default:
         return (
-          <div className={`relative h-32 bg-gradient-to-br ${activity.color} opacity-20 rounded-2xl p-4`}>
+          <div
+            className={`relative h-32 bg-gradient-to-br ${activity.color} opacity-20 rounded-2xl p-4`}
+          >
             <div className="flex items-center justify-center h-full">
               <div className="text-4xl">🏃‍♂️</div>
             </div>
           </div>
-        )
+        );
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white px-4 py-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
             onClick={onBack}
             className="text-gray-600 hover:text-gray-900"
           >
             <ChevronLeft className="w-6 h-6" />
           </Button>
-          
-          <Button 
-            variant="ghost" 
+
+          <Button
+            variant="ghost"
             size="icon"
             className="text-gray-600 hover:text-gray-900"
           >
             <Menu className="w-6 h-6" />
           </Button>
         </div>
-        
+
         <div className="mt-4">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Find your</h1>
           <h2 className="text-2xl font-bold text-gray-900">activity</h2>
@@ -160,22 +168,26 @@ export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: 
 
       {/* Activity Tabs */}
       <div className="px-4 py-6">
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+        <Tabs
+          value={selectedTab}
+          onValueChange={setSelectedTab}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-3 bg-gray-100 rounded-xl p-1">
-            <TabsTrigger 
-              value="popular" 
+            <TabsTrigger
+              value="popular"
               className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium"
             >
               Popular
             </TabsTrigger>
-            <TabsTrigger 
-              value="moderate" 
+            <TabsTrigger
+              value="moderate"
               className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium text-gray-500"
             >
               Moderate
             </TabsTrigger>
-            <TabsTrigger 
-              value="intensive" 
+            <TabsTrigger
+              value="intensive"
               className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium text-gray-500"
             >
               Intensive
@@ -185,15 +197,17 @@ export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: 
           <TabsContent value="popular" className="mt-6">
             <div className="space-y-4">
               {activities.slice(0, 2).map((activity) => (
-                <Card 
-                  key={activity.id} 
+                <Card
+                  key={activity.id}
                   className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => onActivitySelect(activity)}
                 >
                   <CardContent className="p-4">
                     {renderActivityIllustration(activity)}
                     <div className="flex items-center justify-between mt-4">
-                      <h3 className="text-lg font-semibold text-gray-900">{activity.name}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {activity.name}
+                      </h3>
                       <div className="flex items-center gap-1">
                         <span className="text-yellow-500">⚡</span>
                         <span className="text-sm font-medium text-gray-600">
@@ -210,15 +224,17 @@ export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: 
           <TabsContent value="moderate" className="mt-6">
             <div className="space-y-4">
               {activities.slice(2, 4).map((activity) => (
-                <Card 
-                  key={activity.id} 
+                <Card
+                  key={activity.id}
                   className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => onActivitySelect(activity)}
                 >
                   <CardContent className="p-4">
                     {renderActivityIllustration(activity)}
                     <div className="flex items-center justify-between mt-4">
-                      <h3 className="text-lg font-semibold text-gray-900">{activity.name}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {activity.name}
+                      </h3>
                       <div className="flex items-center gap-1">
                         <span className="text-yellow-500">⚡</span>
                         <span className="text-sm font-medium text-gray-600">
@@ -235,15 +251,17 @@ export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: 
           <TabsContent value="intensive" className="mt-6">
             <div className="space-y-4">
               {activities.map((activity) => (
-                <Card 
-                  key={activity.id} 
+                <Card
+                  key={activity.id}
                   className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => onActivitySelect(activity)}
                 >
                   <CardContent className="p-4">
                     {renderActivityIllustration(activity)}
                     <div className="flex items-center justify-between mt-4">
-                      <h3 className="text-lg font-semibold text-gray-900">{activity.name}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {activity.name}
+                      </h3>
                       <div className="flex items-center gap-1">
                         <span className="text-yellow-500">⚡</span>
                         <span className="text-sm font-medium text-gray-600">
@@ -263,24 +281,37 @@ export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-around">
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-400 hover:text-gray-600"
+            >
               <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
                 <div className="w-3 h-3 bg-white rounded-sm"></div>
               </div>
             </Button>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-400 hover:text-gray-600"
+            >
               <div className="w-6 h-6 flex flex-col gap-0.5">
                 <div className="w-full h-1 bg-gray-400 rounded"></div>
                 <div className="w-full h-1 bg-gray-400 rounded"></div>
                 <div className="w-full h-1 bg-gray-400 rounded"></div>
               </div>
             </Button>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-400 hover:text-gray-600"
+              onClick={onCaloriePredictor}
+            >
               <div className="w-6 h-6 border-2 border-gray-400 rounded"></div>
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="text-gray-400 hover:text-gray-600"
               onClick={onNavigateToStats}
             >
@@ -301,5 +332,5 @@ export function ActivityScreen({ onBack, onActivitySelect, onNavigateToStats }: 
         </div>
       </div>
     </div>
-  )
+  );
 }
