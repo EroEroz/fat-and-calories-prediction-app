@@ -5,12 +5,14 @@ interface CaloriePredictorScreenProps {
   onBack: () => void;
   onStatistics: () => void;
   onCaloriePredictor: () => void;
+  onFatburnPredictor: () => void;
 }
 
 export function CaloriePredictorScreen({
   onBack,
   onStatistics,
   onCaloriePredictor,
+  onFatburnPredictor,
 }: CaloriePredictorScreenProps) {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -38,7 +40,7 @@ export function CaloriePredictorScreen({
                 <div className="w-3 h-3 bg-white rounded-sm"></div>
               </div>
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" onClick={onFatburnPredictor}>
               {/* Statistics icon */}
               <div className="w-6 h-6 flex flex-col gap-0.5">
                 <div className="w-full h-1 bg-gray-400 rounded"></div>

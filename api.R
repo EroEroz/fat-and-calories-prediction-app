@@ -17,6 +17,7 @@ cors <- function(req, res) {
 
 #* Load trained model
 model_calories <- readRDS("saved_models/model_calories.rds")
+model_fatburn <- readRDS("saved_models/model_fatburn.rds")
 
 #* @param Age:int
 #* @param Gender
@@ -24,7 +25,7 @@ model_calories <- readRDS("saved_models/model_calories.rds")
 #* @param Weight:double
 #* @param Duration:double
 #* @param Intensity_Level
-#* @get /predict
+#* @get /predict_calories
 function(Age, Gender, Height, Weight, Duration, Intensity_Level){
     Gender_num <- ifelse(tolower(Gender) == "male", 1,
                             ifelse(tolower(Gender) == "female", 0, NA))
@@ -46,5 +47,35 @@ function(Age, Gender, Height, Weight, Duration, Intensity_Level){
         Intensity_Level = factor(Intensity_Level_clean, levels = allowed_levels)
     )
     pred <- predict(model_calories, newdata)
+    list(prediction = as.numeric(pred))
+}
+#* @param Age:int
+#* @param Gender
+#* @param Height:double
+#* @param Weight:double
+#* @param Duration:double
+#* @param Intensity_Level
+#* @get /predict_fatburn
+function(Age, Gender, Height, Weight, Duration, Intensity_Level){
+    Gender_num <- ifelse(tolower(Gender) == "male", 1,
+                            ifelse(tolower(Gender) == "female", 0, NA))
+    Intensity_Level_clean <- tools::toTitleCase(tolower(Intensity_Level))
+    
+    if (is.na(Gender_num)) {
+        return(list(error = "Invalid gender. Please enter 'male' or 'female'."))
+    }
+    allowed_levels <- c("Low", "Moderate", "High", "Very High")
+    if (!(Intensity_Level_clean %in% allowed_levels)) {
+        return(list(error = "Invalid Intensity_Level. Please enter 'Low', 'Moderate', or 'High'."))
+    }
+    newdata <- data.frame(
+        Age = as.integer(Age),
+        Gender = as.integer(Gender_num),
+        Height = as.numeric(Height),
+        Weight = as.numeric(Weight),
+        Duration = as.numeric(Duration),
+        Intensity_Level = factor(Intensity_Level_clean, levels = allowed_levels)
+    )
+    pred <- predict(model_fatburn, newdata)
     list(prediction = as.numeric(pred))
 }
