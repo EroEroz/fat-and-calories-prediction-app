@@ -10,11 +10,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 interface StatisticsScreenProps {
   onBack: () => void;
   onCaloriePredictor: () => void;
+  onFatburnPredictor: () => void;
 }
 
 export function StatisticsScreen({
   onBack,
   onCaloriePredictor,
+  onFatburnPredictor,
 }: StatisticsScreenProps) {
   const [selectedMonth, setSelectedMonth] = useState("april");
   const [selectedPeriod, setSelectedPeriod] = useState("week");
@@ -190,6 +192,7 @@ export function StatisticsScreen({
               variant="ghost"
               size="icon"
               className="text-gray-400 hover:text-gray-600"
+              onClick={onFatburnPredictor}
             >
               <div className="w-6 h-6 flex flex-col gap-0.5">
                 <div className="w-full h-1 bg-gray-400 rounded"></div>

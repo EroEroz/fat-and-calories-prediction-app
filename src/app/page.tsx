@@ -1,19 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { OnboardingScreen } from "@/components/onboarding-screen";
-import { PersonalInfoScreen } from "@/components/personal-info-screen";
 import { ActivityScreen } from "@/components/activity-screen";
 import { StatisticsScreen } from "@/components/statistics-screen";
 import { CaloriePredictorScreen } from "@/components/calorie-predictor-screen";
-import CaloriePredictor from "@/components/calorie-predictor";
+import { FatburnPredictorScreen } from "@/components/fatburn_predictor-screen";
 
 type Screen =
-  | "onboarding"
-  | "personal-info"
   | "activity"
   | "statistics"
-  | "calorie-predictor";
+  | "calorie-predictor"
+  | "fatburn-predictor";
 
 interface Activity {
   id: string;
@@ -31,20 +28,11 @@ interface PersonalInfo {
 }
 
 export default function FitnessTracker() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>("onboarding");
+  const [currentScreen, setCurrentScreen] = useState<Screen>("statistics");
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
     null
   );
-  const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null);
 
-  const handleGetStarted = () => {
-    setCurrentScreen("personal-info");
-  };
-
-  const handlePersonalInfoSubmit = (info: PersonalInfo) => {
-    setPersonalInfo(info);
-    setCurrentScreen("activity");
-  };
 
   const handleActivitySelect = (activity: Activity) => {
     setSelectedActivity(activity);
@@ -52,13 +40,6 @@ export default function FitnessTracker() {
     console.log("Selected activity:", activity);
   };
 
-  const handleBackToOnboarding = () => {
-    setCurrentScreen("onboarding");
-  };
-
-  const handleBackToPersonalInfo = () => {
-    setCurrentScreen("personal-info");
-  };
 
   const handleBackToActivity = () => {
     setCurrentScreen("activity");
@@ -71,30 +52,22 @@ export default function FitnessTracker() {
   const handleNavigateToCaloriePredictor = () => {
     setCurrentScreen("calorie-predictor");
   };
+  const handleNavigateToFatburnPredictor = () => {
+    setCurrentScreen("fatburn-predictor");
+  };
 
   // Render the appropriate screen based on current state
   switch (currentScreen) {
-    case "onboarding":
-      return <OnboardingScreen onGetStarted={handleGetStarted} />;
-
-    case "personal-info":
-      return (
-        <PersonalInfoScreen
-          onBack={handleBackToOnboarding}
-          onContinue={handlePersonalInfoSubmit}
-        />
-      );
 
     case "activity":
       return (
-        <>
-          <ActivityScreen
-            onBack={handleBackToPersonalInfo}
-            onActivitySelect={handleActivitySelect}
-            onNavigateToStats={handleNavigateToStats}
-            onCaloriePredictor={handleNavigateToCaloriePredictor}
-          />
-        </>
+        <ActivityScreen
+          onBack={handleBackToActivity}
+          onActivitySelect={handleActivitySelect}
+          onNavigateToStats={handleNavigateToStats}
+          onCaloriePredictor={handleNavigateToCaloriePredictor}
+          onFatburnPredictor={handleNavigateToFatburnPredictor}
+        />
       );
 
     case "statistics":
@@ -102,6 +75,7 @@ export default function FitnessTracker() {
         <StatisticsScreen
           onBack={handleBackToActivity}
           onCaloriePredictor={handleNavigateToCaloriePredictor}
+          onFatburnPredictor={handleNavigateToFatburnPredictor}
         />
       );
 
@@ -111,10 +85,29 @@ export default function FitnessTracker() {
           onBack={handleBackToActivity}
           onStatistics={handleNavigateToStats}
           onCaloriePredictor={handleNavigateToCaloriePredictor}
+          onFatburnPredictor={handleNavigateToFatburnPredictor}
+        />
+      );
+
+    case "fatburn-predictor":
+      return (
+        <FatburnPredictorScreen
+          onBack={handleBackToActivity}
+          onStatistics={handleNavigateToStats}
+          onCaloriePredictor={handleNavigateToCaloriePredictor}
+          onFatburnPredictor={handleNavigateToFatburnPredictor}
         />
       );
 
     default:
-      return <OnboardingScreen onGetStarted={handleGetStarted} />;
+      return (
+        <ActivityScreen
+          onBack={handleBackToActivity}
+          onActivitySelect={handleActivitySelect}
+          onNavigateToStats={handleNavigateToStats}
+          onCaloriePredictor={handleNavigateToCaloriePredictor}
+          onFatburnPredictor={handleNavigateToFatburnPredictor}
+        />
+      );
   }
 }

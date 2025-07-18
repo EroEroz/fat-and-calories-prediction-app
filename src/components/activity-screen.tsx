@@ -19,6 +19,7 @@ interface ActivityScreenProps {
   onActivitySelect: (activity: Activity) => void;
   onNavigateToStats?: () => void;
   onCaloriePredictor: () => void;
+  onFatburnPredictor: () => void;
 }
 
 export function ActivityScreen({
@@ -26,6 +27,7 @@ export function ActivityScreen({
   onActivitySelect,
   onNavigateToStats,
   onCaloriePredictor,
+  onFatburnPredictor,
 }: ActivityScreenProps) {
   const [selectedTab, setSelectedTab] = useState("popular");
 
@@ -294,6 +296,7 @@ export function ActivityScreen({
               variant="ghost"
               size="icon"
               className="text-gray-400 hover:text-gray-600"
+              onClick={onFatburnPredictor}
             >
               <div className="w-6 h-6 flex flex-col gap-0.5">
                 <div className="w-full h-1 bg-gray-400 rounded"></div>
