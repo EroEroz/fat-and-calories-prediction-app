@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 
-export default function FatPredictor() {
+interface FatPredictorProps {
+  onSaveFat?: (day: string, value: number, month: string) => void;
+}
+
+export default function FatPredictor({ onSaveFat }: FatPredictorProps) {
   const [form, setForm] = useState({
     Age: "",
     Gender: "Male",
@@ -12,6 +16,10 @@ export default function FatPredictor() {
   const [result, setResult] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showSave, setShowSave] = useState(false);
+  const [showDaySelect, setShowDaySelect] = useState(false);
+  const [confirmation, setConfirmation] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("april");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -24,6 +32,9 @@ export default function FatPredictor() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setShowSave(false);
+    setShowDaySelect(false);
+    setConfirmation("");
 
     // Build query string
     const params = new URLSearchParams({
@@ -43,14 +54,40 @@ export default function FatPredictor() {
       if (data.error) {
         setError(data.error);
       } else {
-        setResult(
-          Array.isArray(data.prediction) ? data.prediction[0] : data.prediction
-        );
+        const value = Array.isArray(data.prediction) ? data.prediction[0] : data.prediction;
+        setResult(value);
+        setShowSave(true);
       }
     } catch (err) {
       setError("Failed to get prediction.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSave = () => {
+    setShowDaySelect(true);
+  };
+
+  const handleDaySelect = (day: string) => {
+    if (onSaveFat && result !== null) {
+      onSaveFat(day, Number(result), selectedMonth);
+      setConfirmation(`Saved ${result}g to ${day} (${selectedMonth})`);
+      setTimeout(() => {
+        setResult(null);
+        setShowSave(false);
+        setShowDaySelect(false);
+        setConfirmation("");
+        setForm({
+          Age: "",
+          Gender: "Male",
+          Height: "",
+          Weight: "",
+          Duration: "",
+          Intensity_Level: "Low",
+        });
+        setSelectedMonth("april");
+      }, 1500);
     }
   };
 
@@ -60,6 +97,16 @@ export default function FatPredictor() {
       style={{ maxWidth: 400, margin: "2rem auto" }}
     >
       <h2>Predict Fat Burned</h2>
+      <div style={{ marginBottom: 12 }}>
+        <label>Month: </label>
+        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}>
+          <option value="april">April</option>
+          <option value="may">May</option>
+          <option value="june">June</option>
+          <option value="july">July</option>
+          <option value="august">August</option>
+        </select>
+      </div>
       <input
         name="Age"
         type="number"
@@ -109,9 +156,32 @@ export default function FatPredictor() {
         {loading ? "Predicting..." : "Predict"}
       </button>
       {result !== null && (
-        <div>
-          Estimated Fat Burned: <b>{result}</b>
+        <div style={{ marginTop: 12 }}>
+          Estimated Fat Burned: <b>{result} g</b>
         </div>
+      )}
+      {showSave && !showDaySelect && (
+        <button type="button" style={{ marginTop: 12 }} onClick={handleSave}>
+          Save
+        </button>
+      )}
+      {showDaySelect && (
+        <div style={{ marginTop: 12 }}>
+          <div>Select day to save:</div>
+          { ["M", "T", "W", "Th", "F", "Sa", "Su"].map((d) => (
+            <button
+              key={d}
+              type="button"
+              style={{ margin: 4 }}
+              onClick={() => handleDaySelect(d)}
+            >
+              {d}
+            </button>
+          )) }
+        </div>
+      )}
+      {confirmation && (
+        <div style={{ marginTop: 12, color: "green" }}>{confirmation}</div>
       )}
       {error && <div style={{ color: "red" }}>{error}</div>}
     </form>

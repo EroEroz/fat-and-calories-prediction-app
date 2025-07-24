@@ -6,6 +6,7 @@ interface CaloriePredictorScreenProps {
   onStatistics: () => void;
   onCaloriePredictor: () => void;
   onFatburnPredictor: () => void;
+  onSaveCalories?: (day: string, value: number, month: string) => void;
 }
 
 export function CaloriePredictorScreen({
@@ -13,6 +14,7 @@ export function CaloriePredictorScreen({
   onStatistics,
   onCaloriePredictor,
   onFatburnPredictor,
+  onSaveCalories,
 }: CaloriePredictorScreenProps) {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -27,7 +29,7 @@ export function CaloriePredictorScreen({
 
       {/* Predictor Form */}
       <div className="px-4 py-4">
-        <CaloriePredictor />
+        <CaloriePredictor onSaveCalories={onSaveCalories} />
       </div>
 
       {/* Bottom Navigation */}

@@ -1,3 +1,4 @@
+
 ## How to Run
 
 ### 1. Start the Backend (R)
@@ -20,6 +21,4 @@
   ```
 - Start the development server:
   ```sh
-  npm run dev
-  ```
 - Open [http://localhost:3000](http://localhost:3000) in your browser.
