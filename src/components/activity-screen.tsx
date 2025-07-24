@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChevronLeft, Menu } from 'lucide-react'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 interface Activity {
   id: string
@@ -20,6 +21,8 @@ interface ActivityScreenProps {
   onNavigateToStats?: () => void;
   onCaloriePredictor: () => void;
   onFatburnPredictor: () => void;
+  onPredictionResult: (type: 'fat' | 'calories', value: number, day: string, month: string) => void;
+  selectedMonth: string;
 }
 
 export function ActivityScreen({
@@ -28,8 +31,22 @@ export function ActivityScreen({
   onNavigateToStats,
   onCaloriePredictor,
   onFatburnPredictor,
+  onPredictionResult,
+  selectedMonth,
 }: ActivityScreenProps) {
   const [selectedTab, setSelectedTab] = useState("popular");
+  const [showPredictModal, setShowPredictModal] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [predictType, setPredictType] = useState<'fat' | 'calories' | null>(null);
+  const [duration, setDuration] = useState('');
+  const [day, setDay] = useState('');
+  const [intensity, setIntensity] = useState('');
+  const [age, setAge] = useState('');
+  const [gender, setGender] = useState('Male');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
+  const [predictResult, setPredictResult] = useState<number | null>(null);
+  const [selectedModalMonth, setSelectedModalMonth] = useState('april');
 
   const activities: Activity[] = [
     {
@@ -61,6 +78,19 @@ export function ActivityScreen({
       color: "from-purple-400 to-pink-400",
     },
   ];
+
+  const activityIntensityMap: Record<string, string> = {
+    Swimming: 'Medium',
+    'Playing Tennis': 'High',
+    Running: 'High',
+    Cycling: 'Low',
+  };
+
+  const handleActivityClick = (activity: Activity) => {
+    setSelectedActivity(activity);
+    setIntensity(activityIntensityMap[activity.name] || 'Medium');
+    setShowPredictModal(true);
+  };
 
   const renderActivityIllustration = (activity: Activity) => {
     switch (activity.image) {
@@ -202,7 +232,7 @@ export function ActivityScreen({
                 <Card
                   key={activity.id}
                   className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => onActivitySelect(activity)}
+                  onClick={() => handleActivityClick(activity)}
                 >
                   <CardContent className="p-4">
                     {renderActivityIllustration(activity)}
@@ -229,7 +259,7 @@ export function ActivityScreen({
                 <Card
                   key={activity.id}
                   className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => onActivitySelect(activity)}
+                  onClick={() => handleActivityClick(activity)}
                 >
                   <CardContent className="p-4">
                     {renderActivityIllustration(activity)}
@@ -256,7 +286,7 @@ export function ActivityScreen({
                 <Card
                   key={activity.id}
                   className="bg-white border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => onActivitySelect(activity)}
+                  onClick={() => handleActivityClick(activity)}
                 >
                   <CardContent className="p-4">
                     {renderActivityIllustration(activity)}
@@ -334,6 +364,117 @@ export function ActivityScreen({
           </div>
         </div>
       </div>
+
+      <Dialog open={showPredictModal} onOpenChange={setShowPredictModal}>
+        <DialogContent>
+          <DialogTitle>Predict for {selectedActivity?.name}</DialogTitle>
+          <div style={{ marginBottom: 12 }}>
+            <label>Month: </label>
+            <select value={selectedModalMonth} onChange={e => setSelectedModalMonth(e.target.value)}>
+              <option value="april">April</option>
+              <option value="may">May</option>
+              <option value="june">June</option>
+              <option value="july">July</option>
+              <option value="august">August</option>
+            </select>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>What do you want to predict?</label>
+            <select value={predictType ?? ''} onChange={e => setPredictType(e.target.value as 'fat' | 'calories')} style={{ marginLeft: 8 }}>
+              <option value="">Select</option>
+              <option value="fat">Fat Burn</option>
+              <option value="calories">Calories Burn</option>
+            </select>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Age</label>
+            <input type="number" value={age} onChange={e => setAge(e.target.value)} style={{ marginLeft: 8 }} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Height (cm)</label>
+            <input type="number" value={height} onChange={e => setHeight(e.target.value)} style={{ marginLeft: 8 }} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Weight (kg)</label>
+            <input type="number" value={weight} onChange={e => setWeight(e.target.value)} style={{ marginLeft: 8 }} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Gender</label>
+            <select value={gender} onChange={e => setGender(e.target.value)} style={{ marginLeft: 8 }}>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Intensity</label>
+            <input value={intensity} readOnly style={{ marginLeft: 8 }} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Duration (minutes)</label>
+            <input type="number" value={duration} onChange={e => setDuration(e.target.value)} style={{ marginLeft: 8 }} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label>Day</label>
+            <select value={day} onChange={e => setDay(e.target.value)} style={{ marginLeft: 8 }}>
+              <option value="">Select</option>
+              <option value="M">M</option>
+              <option value="T">T</option>
+              <option value="W">W</option>
+              <option value="Th">Th</option>
+              <option value="F">F</option>
+              <option value="Sa">Sa</option>
+              <option value="Su">Su</option>
+            </select>
+          </div>
+          <Button
+            onClick={async () => {
+              // Map intensity for backend
+              const intensityMap = { Low: "Low", Medium: "Moderate", High: "High" };
+              const mappedIntensity = intensityMap[intensity as keyof typeof intensityMap] || intensity;
+              // Build query string
+              const params = new URLSearchParams({
+                Age: age,
+                Gender: gender,
+                Height: height,
+                Weight: weight,
+                Duration: duration,
+                Intensity_Level: mappedIntensity,
+              });
+
+              // Choose endpoint based on predictType
+              const endpoint =
+                predictType === "calories"
+                  ? "predict_calories"
+                  : "predict_fatburn";
+
+              const url = `http://127.0.0.1:8000/${endpoint}?${params.toString()}`;
+              console.log('Fetching:', url);
+              const response = await fetch(url);
+              const data = await response.json();
+              const predictionRaw = Array.isArray(data.prediction) ? data.prediction[0] : data.prediction;
+              const prediction = Number(predictionRaw);
+              console.log('Prediction:', prediction, 'Type:', predictType, 'Day:', day, 'Month:', selectedModalMonth);
+              if (!isNaN(prediction) && predictType && day && selectedModalMonth) {
+                setPredictResult(prediction); // Show result before closing
+                setTimeout(() => {
+                  onPredictionResult(predictType, prediction, day, selectedModalMonth);
+                  setShowPredictModal(false);
+                  setPredictResult(null);
+                }, 1500); // Show result for 1.5s
+              }
+            }}
+            disabled={!predictType || !duration || !day || !age || !height || !weight}
+            style={{ marginBottom: 12, width: '100%' }}
+          >
+            Predict & Save
+          </Button>
+          {predictResult !== null && (
+            <div style={{ marginTop: 8, fontWeight: 'bold', color: '#2563eb' }}>
+              {predictType === 'fat' ? `Predicted Fat: ${predictResult} g` : `Predicted Calories: ${predictResult}`}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

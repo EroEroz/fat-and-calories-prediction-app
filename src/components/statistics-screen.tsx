@@ -11,14 +11,37 @@ interface StatisticsScreenProps {
   onBack: () => void;
   onCaloriePredictor: () => void;
   onFatburnPredictor: () => void;
+  fat: number;
+  calories: number;
+  chartsByMonth: { [k: string]: { day: string; fat: number; calories: number }[] };
+  setFat: React.Dispatch<React.SetStateAction<number>>;
+  setCalories: React.Dispatch<React.SetStateAction<number>>;
+  setChartsByMonth: React.Dispatch<React.SetStateAction<{ [k: string]: { day: string; fat: number; calories: number }[] }>>;
+  selectedMonth: string;
+  setSelectedMonth: React.Dispatch<React.SetStateAction<string>>;
+  name: string;
+  setName: React.Dispatch<React.SetStateAction<string>>;
+  nationality: string;
+  setNationality: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export function StatisticsScreen({
   onBack,
   onCaloriePredictor,
   onFatburnPredictor,
+  fat,
+  calories,
+  chartsByMonth,
+  setFat,
+  setCalories,
+  setChartsByMonth,
+  selectedMonth,
+  setSelectedMonth,
+  name,
+  setName,
+  nationality,
+  setNationality,
 }: StatisticsScreenProps) {
-  const [selectedMonth, setSelectedMonth] = useState("april");
   const [selectedPeriod, setSelectedPeriod] = useState("week");
 
   const months = ["april", "may", "june", "july", "august"];
@@ -31,32 +54,26 @@ export function StatisticsScreen({
     { day: "S", value: 0, color: "bg-blue-400" },
     { day: "S", value: 0, color: "bg-green-400" },
   ];
-  const [chartsByMonth, setChartsByMonth] = useState(
-    Object.fromEntries(months.map(m => [m, defaultChart.map(d => ({ ...d }))]))
-  );
   const chartData = chartsByMonth[selectedMonth];
-  const setChartData = (newData: { day: string; value: number; color: string }[]) => {
+  // For scaling, get the max of fat and calories separately
+  const maxFat = Math.max(...chartData.map((d) => d.fat));
+  const maxCalories = Math.max(...chartData.map((d) => d.calories));
+  const setChartData = (newData: { day: string; fat: number; calories: number }[]) => {
     setChartsByMonth(prev => ({
       ...prev,
       [selectedMonth]: newData
     }));
   };
-  const [name, setName] = useState("Nguyen Van Den");
   const [isEditingName, setIsEditingName] = useState(false);
-  const [nationality, setNationality] = useState("Vietnam");
   const [nationalityInput, setNationalityInput] = useState(nationality);
   const [isEditingNationality, setIsEditingNationality] = useState(false);
 
-  const [fat, setFat] = useState(0.45);
-  const [calories, setCalories] = useState(3512);
   const [isEditingStats, setIsEditingStats] = useState(false);
   const [editingBarIndex, setEditingBarIndex] = useState<number | null>(null);
   const [barInputValue, setBarInputValue] = useState<string>("");
 
   const [fatInput, setFatInput] = useState(fat.toString());
   const [caloriesInput, setCaloriesInput] = useState(calories.toString());
-
-  const maxValue = Math.max(...chartData.map((d) => d.value));
 
   // Debug: log selectedMonth and chartData
   console.log(selectedMonth, chartData);
@@ -73,6 +90,10 @@ export function StatisticsScreen({
     // Take first letter of first and last word
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
+
+  // Calculate monthly fat and calories sum for the selected month
+  const monthlyFat = chartData.reduce((sum, d) => sum + d.fat, 0);
+  const monthlyCalories = chartData.reduce((sum, d) => sum + d.calories, 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -208,59 +229,27 @@ export function StatisticsScreen({
                     key={`${selectedMonth}-${index}`}
                     className="flex flex-col items-center gap-2 flex-1"
                   >
-                    <div className="relative w-full flex items-end justify-center h-24">
-                      {editingBarIndex === index ? (
-                        <input
-                          type="number"
-                          className="w-12 border rounded text-center text-sm"
-                          value={barInputValue}
-                          onChange={(e) => setBarInputValue(e.target.value)}
-                          onBlur={() => {
-                            const newChartData = [...chartData];
-                            const parsed = parseFloat(barInputValue);
-                            if (!isNaN(parsed)) {
-                              newChartData[index] = {
-                                ...newChartData[index],
-                                value: parsed,
-                              };
-                              setChartData(newChartData);
-                            }
-                            setEditingBarIndex(null);
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              const newChartData = [...chartData];
-                              const parsed = parseFloat(barInputValue);
-                              if (!isNaN(parsed)) {
-                                newChartData[index] = {
-                                  ...newChartData[index],
-                                  value: parsed,
-                                };
-                                setChartData(newChartData);
-                              }
-                              setEditingBarIndex(null);
-                            }
-                            if (e.key === "Escape") {
-                              setEditingBarIndex(null);
-                            }
-                          }}
-                          autoFocus
-                        />
-                      ) : (
-                        <div
-                          className={`w-3 ${item.color} rounded-full transition-all duration-300`}
-                          style={{
-                            height: `${Math.max((item.value / maxValue) * 100, 12)}%`,
-                            minHeight: '12px',
-                            cursor: 'pointer',
-                          }}
-                          onClick={() => {
-                            setEditingBarIndex(index);
-                            setBarInputValue(item.value.toString());
-                          }}
-                          title="Click to edit"
-                        ></div>
-                      )}
+                    <div className="relative w-full flex items-end justify-center h-24 gap-1">
+                      {/* Fat bar */}
+                      <div
+                        className={`w-2 bg-green-400 rounded-full transition-all duration-300`}
+                        style={{
+                          height: `${maxFat ? Math.max((item.fat / maxFat) * 100, 12) : 12}%`,
+                          minHeight: '12px',
+                          cursor: 'pointer',
+                        }}
+                        title={`Fat: ${item.fat}g`}
+                      ></div>
+                      {/* Calories bar */}
+                      <div
+                        className={`w-2 bg-blue-400 rounded-full transition-all duration-300`}
+                        style={{
+                          height: `${maxCalories ? Math.max((item.calories / maxCalories) * 100, 12) : 12}%`,
+                          minHeight: '12px',
+                          cursor: 'pointer',
+                        }}
+                        title={`Calories: ${item.calories}`}
+                      ></div>
                     </div>
                     <span className="text-xs text-gray-500 font-medium">
                       {item.day}
@@ -288,7 +277,7 @@ export function StatisticsScreen({
                       value={fatInput}
                       onChange={e => setFatInput(e.target.value)}
                     />
-                    <span className="text-sm text-gray-500 ml-2">kg burned</span>
+                    <span className="text-sm text-gray-500 ml-2">g burned</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -331,7 +320,7 @@ export function StatisticsScreen({
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900">Fat</h4>
-                    <p className="text-sm text-gray-500">{fat} kg burned</p>
+                    <p className="text-sm text-gray-500">{monthlyFat.toFixed(2)} g burned</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -342,7 +331,7 @@ export function StatisticsScreen({
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900">Calories</h4>
-                    <p className="text-sm text-gray-500">{calories} calories burned</p>
+                    <p className="text-sm text-gray-500">{monthlyCalories.toFixed(2)} calories burned</p>
                   </div>
                 </div>
                 <span className="text-xs text-gray-400">(Click to edit)</span>
