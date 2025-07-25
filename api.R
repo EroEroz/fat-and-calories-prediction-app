@@ -34,7 +34,7 @@ function(Age, Gender, Height, Weight, Duration, Intensity_Level){
     if (is.na(Gender_num)) {
         return(list(error = "Invalid gender. Please enter 'male' or 'female'."))
     }
-    allowed_levels <- c("Low", "Moderate", "High", "Very High")
+    allowed_levels <- c("Low", "Moderate", "High")
     if (!(Intensity_Level_clean %in% allowed_levels)) {
         return(list(error = "Invalid Intensity_Level. Please enter 'Low', 'Moderate', or 'High'."))
     }
@@ -64,7 +64,7 @@ function(Age, Gender, Height, Weight, Duration, Intensity_Level){
     if (is.na(Gender_num)) {
         return(list(error = "Invalid gender. Please enter 'male' or 'female'."))
     }
-    allowed_levels <- c("Low", "Moderate", "High", "Very High")
+    allowed_levels <- c("Low", "Moderate", "High")
     if (!(Intensity_Level_clean %in% allowed_levels)) {
         return(list(error = "Invalid Intensity_Level. Please enter 'Low', 'Moderate', or 'High'."))
     }
